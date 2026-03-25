@@ -1,0 +1,53 @@
+/* ═══════════════════════════════════════════════════════════════
+   style.css  –  Ghost Protocol · Stealth Game
+   ═══════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&display=swap');
+
+/* ── Reset ──────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ── Root ───────────────────────────────────────────────────── */
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: #04040d;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+/* ── Canvas ─────────────────────────────────────────────────── */
+#gameCanvas {
+  display: block;
+  cursor: crosshair;
+  image-rendering: pixelated; /* keep crisp at integer scales */
+}
+
+/* ── CRT scanline overlay (pure CSS, pointer-events: none) ──── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.04) 2px,
+    rgba(0, 0, 0, 0.04) 4px
+  );
+  pointer-events: none;
+  z-index: 10;
+}

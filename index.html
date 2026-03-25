@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GHOST PROTOCOL – Stealth Game</title>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Game canvas – all rendering happens here -->
+  <canvas id="gameCanvas"></canvas>
+
+  <!--
+    Scripts are loaded in dependency order:
+      1. fsm.js          – FSM class
+      2. pathfinding.js  – NavGrid (A* + string-pull), getNavGrid()
+      3. player.js       – Particle system + Player class
+      4. enemy.js        – Guard class (uses FSM, NavGrid)
+      5. main.js         – Constants, levels, utilities, canvas, loop, events
+  -->
+  <script src="js/fsm.js"></script>
+  <script src="js/neural.js"></script>
+  <script src="js/pathfinding.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/enemy.js"></script>
+  <script src="js/main.js"></script>
+
+</body>
+</html>
