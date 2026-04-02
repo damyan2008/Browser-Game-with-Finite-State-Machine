@@ -574,7 +574,7 @@ function drawHUD() {
   ctx.fillStyle = 'rgba(200,100,255,0.8)';
   ctx.font      = 'bold 8px Orbitron';
   ctx.textAlign = 'left';
-  ctx.fillText('◈ NEURAL NETS', nx, ny);
+  ctx.fillText('Randomization', nx, ny);
 
   guards.forEach((g, i) => {
     const gy   = ny + 10 + i * 10;
