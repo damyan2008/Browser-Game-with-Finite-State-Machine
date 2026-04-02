@@ -307,7 +307,7 @@ let alertPct = 0;    // global alarm level 0–100
 let gameTime = 0;
 let huntMode  = false; // true while all guards are in coordinated hunt
 let huntTimer = 0;     // seconds elapsed since hunt mode started
-const HUNT_DURATION = 15; // seconds hunt lasts before guards stand down
+const HUNT_DURATION = 45; // seconds hunt lasts before guards stand down
 
 /** Transition to a new game state and fire relevant custom events. */
 function setGameState(s) {
