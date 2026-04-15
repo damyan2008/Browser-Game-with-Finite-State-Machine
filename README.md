@@ -1,4 +1,4 @@
-# GHOST PROTOCOL 🕵️
+# GHOST PROTOCOL
 
 A browser-based top-down stealth game built with HTML5 Canvas and JavaScript.  
 
