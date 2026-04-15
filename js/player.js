@@ -1,15 +1,11 @@
-// ╔══════════════════════════════════════════════════════════════╗
-// ║  player.js  –  Particle system & Player entity              ║
-// ║  Depends on: main.js globals (C, GW, GH, PLAYER_SPD,       ║
-// ║    keys, mousePos, chips, chipsGot, score, EXIT,            ║
-// ║    dist, moveWithCollision, setGameState)                   ║
-// ╚══════════════════════════════════════════════════════════════╝
+// player.js  –  Particle system & Player entity              
+// Depends on: main.js globals (C, GW, GH, PLAYER_SPD,       
+//  keys, mousePos, chips, chipsGot, score, EXIT,            
+//  dist, moveWithCollision, setGameState)                   
 'use strict';
 
 
-// ╔══════════════════════════════════════════════════════════════╗
-// ║  PARTICLE SYSTEM                                            ║
-// ╚══════════════════════════════════════════════════════════════╝
+//   PARTICLE SYSTEM
 
 class Particle {
   /**
@@ -73,9 +69,7 @@ function burst(x, y, color, n = 10, speedMul = 1) {
 }
 
 
-// ╔══════════════════════════════════════════════════════════════╗
-// ║  PLAYER                                                     ║
-// ╚══════════════════════════════════════════════════════════════╝
+//  PLAYER
 
 class Player {
   /**
@@ -98,7 +92,7 @@ class Player {
   update(dt) {
     if (!this.alive) return;
 
-    // ── Movement (WASD / Arrow keys) ────────────────────────────
+    // Movement (WASD / Arrow keys)
     let dx = 0, dy = 0;
     if (keys['KeyW']  || keys['ArrowUp'])    dy -= 1;
     if (keys['KeyS']  || keys['ArrowDown'])  dy += 1;
@@ -115,12 +109,12 @@ class Player {
     this.x = Math.max(this.r + 12, Math.min(GW - this.r - 12, this.x));
     this.y = Math.max(this.r + 12, Math.min(GH - this.r - 12, this.y));
 
-    // ── Aim towards mouse ────────────────────────────────────────
+    // Aim towards mouse
     this.angle    = Math.atan2(mousePos.y - this.y, mousePos.x - this.x);
     this.pulse   += dt * 3;
     this.hitTimer = Math.max(0, this.hitTimer - dt);
 
-    // ── Hiding spot detection ────────────────────────────────────
+    // Hiding spot detection
     this.hiding = HIDING_SPOTS.some(
       s => this.x >= s.x && this.x <= s.x + s.w &&
            this.y >= s.y && this.y <= s.y + s.h
@@ -136,7 +130,7 @@ class Player {
       }
     });
 
-    // ── Exit detection ──────────────────────────────────────────
+    // Exit detection
     if (chipsGot >= chips.length && dist(this, EXIT) < EXIT.r + this.r) {
       score += 300;
       burst(this.x, this.y, C.exit, 30);

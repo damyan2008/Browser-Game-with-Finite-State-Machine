@@ -1,27 +1,23 @@
-// ╔══════════════════════════════════════════════════════════════╗
-// ║  enemy.js  –  Guard entity with FSM-controlled AI           ║
-// ║  Depends on: fsm.js (FSM class)                             ║
-// ║             main.js globals (C, WALLS, SIGHT_RANGE,         ║
-// ║               FOV_ANGLE, ATTACK_DIST, ATK_DMG, ATK_CD,     ║
-// ║               SPD_PATROL, SPD_CHASE, SPD_SEARCH,            ║
-// ║               dist, hasLOS, moveWithCollision)              ║
-// ╚══════════════════════════════════════════════════════════════╝
+//   enemy.js  –  Guard entity with FSM-controlled AI           
+//   Depends on: fsm.js (FSM class)                             
+//              main.js globals (C, WALLS, SIGHT_RANGE,         
+//                FOV_ANGLE, ATTACK_DIST, ATK_DMG, ATK_CD,     
+//                SPD_PATROL, SPD_CHASE, SPD_SEARCH,           
+//                dist, hasLOS, moveWithCollision)             
+
 'use strict';
 
 
-// ╔══════════════════════════════════════════════════════════════╗
-// ║  GUARD                                                      ║
-// ║                                                             ║
-// ║  FSM States:                                                ║
-// ║    PATROL  → walks waypoint loop                            ║
-// ║    ALERT   → freezes, "!" pops up (0.8 s)                  ║
-// ║    CHASE   → sprints toward player                          ║
-// ║    ATTACK  → strikes player at close range                  ║
-// ║    SEARCH  → moves to last known player position            ║
-// ║    RETURN  → walks back to first waypoint                   ║
-// ║    HUNT    → global hunt; omniscient, max speed, no FOV     ║
-// ║              (triggered when alert level hits 100 %)        ║
-// ╚══════════════════════════════════════════════════════════════╝
+// GUARD                                                      
+//   FSM States:                                               
+//     PATROL  → walks waypoint loop                           
+//     ALERT   → freezes, "!" pops up (0.8 s)                  
+//     CHASE   → sprints toward player                          
+//     ATTACK  → strikes player at close range                  
+//     SEARCH  → moves to last known player position            
+//     RETURN  → walks back to first waypoint                   
+//     HUNT    → global hunt; omniscient, max speed, no FOV     
+//               (triggered when alert level hits 100 %)        
 
 class Guard {
   /**
@@ -39,20 +35,20 @@ class Guard {
     this.flashT    = 0;       // alert-ring flash timer
     this.exclT     = 0;       // "!" exclamation timer
 
-    // ── Random-wander patrol state ───────────────────────────────
+    //  Random-wander patrol state
     this._wanderTarget    = null;   // current patrol destination {x, y}
     this._wanderIdleT     = 0;      // seconds to idle before picking next target
     this._returnTarget    = null;   // current RETURN destination (normally home, can repath)
     this._homeX           = def.x;  // spawn X – used as RETURN target
     this._homeY           = def.y;  // spawn Y
 
-    // ── A* navigation state ──────────────────────────────────────
+    //  A* navigation state
     this._navPath         = [];     // current string-pulled waypoint list
     this._navWpIdx        = 0;      // index of the waypoint we're heading to
     this._navGoal         = null;   // goal {x,y} we last computed a path for
     this._navRecomputeDist = 40;    // recompute path if goal drifted > this (px)
 
-    // ── Movement / wall-avoidance state ─────────────────────────
+    //  Movement / wall-avoidance state
     this._stuckTimer       = 0;
     this._prevPos          = null;
     this._wallBounceCount  = 0;
@@ -60,24 +56,24 @@ class Guard {
     this._steerLockTimer   = 0;
     this._targetAngle      = 0;
 
-    // ── Player velocity estimator ────────────────────────────────
+    //  Player velocity estimator
     this._prevPlayerPos = null;
     this._playerVel     = { x: 0, y: 0 };
 
-    // ── Neural Network brain (survives game restarts) ────────────
+    //  Neural Network brain (survives game restarts)
     this.brain = new GuardBrain(def.id);
 
-    // ── Build FSM ────────────────────────────────────────────────
+    //  Build FSM
     this.fsm = new FSM('PATROL');
     this._buildFSM();
   }
 
-  // ── FSM construction ──────────────────────────────────────────
+  //  FSM construction
   _buildFSM() {
     const f = this.fsm;
     const g = this;
 
-    // ── HUNT transitions (highest priority – checked first) ──────
+    //  HUNT transitions (highest priority – checked first)
 
     // Any non-HUNT, non-ATTACK state → HUNT : global alarm hit 100 %
     f.addTransition(
@@ -99,7 +95,7 @@ class Guard {
       ctx => !ctx.huntMode,
       ctx => { g.lastKnown = ctx.pp ? { ...ctx.pp } : g.lastKnown; });
 
-    // ── Normal transitions ────────────────────────────────────────
+    //  Normal transitions
 
     // PATROL → ALERT : player steps into FOV + line of sight
     f.addTransition('PATROL', 'ALERT',
@@ -138,14 +134,14 @@ class Guard {
       () => { g.exclT = 1.2; g.flashT = 0.15; });
   }
 
-  // ── Per-frame update ─────────────────────────────────────────
+  // Per-frame update
   update(dt, player) {
     // Tick timers
     if (this.atkCD  > 0) this.atkCD  -= dt;
     if (this.flashT > 0) this.flashT -= dt;
     if (this.exclT  > 0) this.exclT  -= dt;
 
-    // ── Smooth turn: interpolate this.angle toward _targetAngle ──
+    //  Smooth turn: interpolate this.angle toward _targetAngle 
     // State-dependent turn speed: faster when chasing/hunting, slower on patrol.
     const state0 = this.fsm.state;
     const turnSpd = (state0 === 'CHASE' || state0 === 'HUNT' || state0 === 'ATTACK')
@@ -159,7 +155,7 @@ class Guard {
       ? angleDiff
       : Math.sign(angleDiff) * maxStep;
 
-    // ── Estimate player velocity (EMA) ───────────────────────────
+    //  Estimate player velocity (EMA)
     if (player.alive) {
       if (this._prevPlayerPos) {
         const rawVx = (player.x - this._prevPlayerPos.x) / dt;
@@ -199,7 +195,7 @@ class Guard {
       if (this.fsm.state === 'PATROL') this.exclT = 1.2;
     }
 
-    // ── Neural Network: observe + train ──────────────────────────
+    //  Neural Network: observe + train
     // NN learns player movement for heatmap-guided patrol,
     // but A* always routes to the real player position (not an
     // NN-predicted intercept) so walls are correctly avoided.
@@ -272,8 +268,6 @@ class Guard {
     }
   }
 
-  // ── Helpers ───────────────────────────────────────────────────
-
   /** Returns true if target t is within the guard's field of view. */
   _inFOV(t) {
     const a = Math.atan2(t.y - this.y, t.x - this.x);
@@ -338,7 +332,7 @@ class Guard {
    * @param {number} [recomputeDist] Recompute path when goal drifts > this (px)
    */
   _navigate(tx, ty, spd, dt, recomputeDist = 50) {
-    // ── Decide if we need a new path ──────────────────────────────
+    //  Decide if we need a new path
     const goalDrifted = !this._navGoal ||
       Math.hypot(tx - this._navGoal.x, ty - this._navGoal.y) > recomputeDist;
 
@@ -348,7 +342,7 @@ class Guard {
       this._navWpIdx = 0;
     }
 
-    // ── Follow path waypoints ─────────────────────────────────────
+    //  Follow path waypoints
     if (this._navPath.length === 0) {
       // No path found (unreachable) – fall back to direct move
       this._moveTo(tx, ty, spd, dt);
@@ -368,17 +362,6 @@ class Guard {
     this._moveTo(wp.x, wp.y, spd, dt);
   }
 
-  /**
-   *
-   * Uses a commit-and-hold wall avoidance system:
-   *   1. Cast a direct ray toward the target (and two narrow flanking rays).
-   *   2. If the path is CLEAR → move straight, clear any lock.
-   *   3. If BLOCKED → sweep 24 candidate angles, score each by clear distance
-   *      weighted toward the goal, pick the best, lock onto it.
-   *   4. During a lock hold → keep using the locked angle, no re-evaluation.
-   *   5. Stuck detection increments _wallBounceCount for repath if the guard
-   *      truly hasn't moved (e.g. trapped in a corner the sweep can't escape).
-   */
   _moveTo(tx, ty, spd, dt) {
     const d = Math.hypot(tx - this.x, ty - this.y);
     if (d < 2) {
@@ -391,13 +374,13 @@ class Guard {
 
     const baseAngle = Math.atan2(ty - this.y, tx - this.x);
 
-    // ── Tick the lock hold timer ──────────────────────────────────
+    //  Tick the lock hold timer 
     if (this._steerLockTimer > 0) {
       this._steerLockTimer -= dt;
       if (this._steerLockTimer <= 0) this._steerLockedAngle = null;
     }
 
-    // ── Determine movement angle ──────────────────────────────────
+    //  Determine movement angle 
     let finalAngle;
 
     if (this._steerLockedAngle !== null) {
@@ -418,7 +401,7 @@ class Guard {
 
     this._targetAngle = finalAngle;
 
-    // ── Stuck detection (for repath trigger) ─────────────────────
+    //  Stuck detection (for repath trigger)
     this._stuckTimer = (this._stuckTimer || 0) + dt;
     if (!this._prevPos) this._prevPos = { x: this.x, y: this.y };
     if (this._stuckTimer >= 0.5) {
@@ -439,11 +422,6 @@ class Guard {
     moveWithCollision(this, Math.cos(this.angle), Math.sin(this.angle), spd, dt);
   }
 
-  /**
-   * Cast the direct-path probe: one centre ray + two narrow flanking rays
-   * (±12°) at LOOK_AHEAD distance.  Returns true only if ALL three are clear.
-   * The flanking rays catch wall edges that the centre ray would miss.
-   */
   _pathClear(angle) {
     const LOOK_AHEAD = STEER_PROBE_DIST;
     const FLANK      = Math.PI / 15; // 12°
@@ -458,16 +436,6 @@ class Guard {
     return true;
   }
 
-  /**
-   * Sweep STEER_CANDIDATES evenly-spaced angles across a full circle,
-   * score each by (clearDist − goalBias), and return the best.
-   *
-   * clearDist: how far the ray travels before hitting a wall (0–LOOK_AHEAD).
-   * goalBias : bonus for angles that point toward the target (0–1 × GOAL_WEIGHT).
-   *
-   * This guarantees we pick a direction that is (a) actually open and
-   * (b) still broadly aimed at the goal, avoiding arbitrary U-turns.
-   */
   _findClearAngle(preferAngle) {
     const LOOK     = STEER_PROBE_DIST;
     const N        = STEER_CANDIDATES;
@@ -515,12 +483,12 @@ class Guard {
     this._returnTarget     = null;
   }
 
-  // ── Rendering ─────────────────────────────────────────────────
+  //  Rendering
   draw(ctx) {
     const state = this.fsm.state;
     const col   = C.guard[state] || '#ffffff';
 
-    // ── Long-range wall vision rays ───────────────────────────────
+    //  Long-range wall vision rays
     // Three rays (centre + ±12°) of VISION_RAY_LEN px so guards
     // "see" walls across entire corridors.
     {
@@ -555,7 +523,7 @@ class Guard {
       }
     }
 
-    // ── A* nav path ───────────────────────────────────────────────
+    //  A* nav path
     if (this._navPath.length > 1) {
       ctx.save();
       ctx.globalAlpha = 0.28;

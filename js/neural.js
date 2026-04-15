@@ -1,18 +1,18 @@
-// ╔══════════════════════════════════════════════════════════════╗
-// ║  neural.js  –  Online-learning Neural Network system        ║
-// ║                                                             ║
-// ║  Each guard has a GuardBrain that:                          ║
-// ║    1. Observes the player each frame (inputs + position)    ║
-// ║    2. Waits PREDICT_AHEAD seconds                           ║
-// ║    3. Measures where the player actually moved              ║
-// ║    4. Trains the NeuralNetwork on that labelled sample      ║
-// ║    5. During CHASE/HUNT, uses the NN to predict where the   ║
-// ║       player will be and intercepts rather than chasing     ║
-// ║                                                             ║
-// ║  Architecture:  8 inputs → 14 hidden (ReLU) → 2 outputs    ║
-// ║  Optimiser:     Adam  (β1=0.9, β2=0.999, ε=1e-8, lr=0.02)  ║
-// ║  Loss:          Mean Squared Error                          ║
-// ╚══════════════════════════════════════════════════════════════╝
+
+//   neural.js  –  Online-learning Neural Network system        
+//                                                              
+//   Each guard has a GuardBrain that:                          
+//     1. Observes the player each frame (inputs + position)    
+//     2. Waits PREDICT_AHEAD seconds                           
+//     3. Measures where the player actually moved              
+//     4. Trains the NeuralNetwork on that labelled sample      
+//     5. During CHASE/HUNT, uses the NN to predict where the   
+//        player will be and intercepts rather than chasing     
+//                                                              
+//   Architecture:  8 inputs → 14 hidden (ReLU) → 2 outputs    
+//   Optimiser:     Adam  (β1=0.9, β2=0.999, ε=1e-8, lr=0.02)  
+//   Loss:          Mean Squared Error                          
+
 'use strict';
 
 // ── Hyper-parameters ────────────────────────────────────────────
@@ -42,9 +42,9 @@ const HEAT_MIN_DRAW       = 3;
 const HEAT_SAMPLE_RADIUS  = 60;
 
 
-// ╔══════════════════════════════════════════════════════════════╗
-// ║  NeuralNetwork                                              ║
-// ╚══════════════════════════════════════════════════════════════╝
+
+//   AI                                             
+
 class NeuralNetwork {
   constructor(inputSize, hiddenSize, outputSize) {
     this.iSz = inputSize;
@@ -169,9 +169,8 @@ class NeuralNetwork {
 }
 
 
-// ╔══════════════════════════════════════════════════════════════╗
-// ║  ExperienceBuffer                                           ║
-// ╚══════════════════════════════════════════════════════════════╝
+// ║  ExperienceBuffer                                           
+
 class ExperienceBuffer {
   constructor(maxSize) {
     this.maxSize = maxSize;
@@ -193,9 +192,8 @@ class ExperienceBuffer {
 }
 
 
-// ╔══════════════════════════════════════════════════════════════╗
-// ║  SightingHeatmap                                            ║
-// ╚══════════════════════════════════════════════════════════════╝
+// ║  SightingHeatmap                                            
+
 class SightingHeatmap {
   constructor() {
     this._grid     = new Float32Array(HEAT_COLS * HEAT_ROWS);
@@ -245,9 +243,8 @@ class SightingHeatmap {
 }
 
 
-// ╔══════════════════════════════════════════════════════════════╗
-// ║  GuardBrain                                                 ║
-// ╚══════════════════════════════════════════════════════════════╝
+// ║  GuardBrain                                                 
+
 class GuardBrain {
   constructor(guardId) {
     this.guardId    = guardId;

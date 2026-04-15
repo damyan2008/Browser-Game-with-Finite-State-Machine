@@ -1,7 +1,5 @@
-// ╔══════════════════════════════════════════════════════════════╗
-// ║  fsm.js  –  Finite State Machine (reusable module)          ║
-// ║  Assignment: Browser Game with Finite State Machine         ║
-// ╚══════════════════════════════════════════════════════════════╝
+//   fsm.js  –  Finite State Machine (reusable module)          
+//   Assignment: Browser Game with Finite State Machine         
 'use strict';
 
 /**

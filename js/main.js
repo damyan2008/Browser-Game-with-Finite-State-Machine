@@ -1,14 +1,11 @@
-// ╔══════════════════════════════════════════════════════════════╗
-// ║  main.js  –  Entry point                                    ║
-// ║  Handles: constants, map, utilities, canvas scaling,        ║
-// ║           game state, drawing, input events, game loop      ║
-// ╚══════════════════════════════════════════════════════════════╝
+//   main.js  –  Entry point                                    
+//   Handles: constants, map, utilities, canvas scaling,        
+//            game state, drawing, input events, game loop      
+
 'use strict';
 
 
-// ════════════════════════════════════════════════════════════════
 //  CONSTANTS
-// ════════════════════════════════════════════════════════════════
 
 // Logical game-world dimensions (canvas is scaled to fit the window)
 const GW = 900, GH = 600;
@@ -40,10 +37,8 @@ const TURN_SPEED_FAST          = Math.PI * 4.5;  // CHASE / HUNT / ATTACK
 const TURN_SPEED_SLOW          = Math.PI * 2.2;  // PATROL / SEARCH / RETURN
 
 
-
-// ════════════════════════════════════════════════════════════════
 //  COLOUR PALETTE
-// ════════════════════════════════════════════════════════════════
+
 const C = {
   bg:           '#06060f',
   gridMinor:    '#0a0a1e',
@@ -76,12 +71,10 @@ const C = {
 };
 
 
-// ════════════════════════════════════════════════════════════════
 //  LEVELS
-// ════════════════════════════════════════════════════════════════
 
 const LEVELS = [
-  // ── Level 1 ─────────────────────────────────────────────────
+  // Level 1
   {
     walls: [
       {x:0,    y:0,    w:GW,  h:12},
@@ -118,7 +111,7 @@ const LEVELS = [
     ],
   },
 
-  // ── Level 2 ─────────────────────────────────────────────────
+  //  Level 2
   {
     walls: [
       // Border
@@ -170,7 +163,7 @@ const LEVELS = [
   },
 ];
 
-// ── Active level state (populated by loadLevel) ──────────────────
+//  Active level state (populated by loadLevel)
 let WALLS        = [];
 let EXIT         = { x: 0, y: 0, r: 20 };
 let HIDING_SPOTS = [];
@@ -194,19 +187,14 @@ function loadLevel(n) {
 function rebuildNavGrid() { _sharedGrid = null; }
 
 
-// ════════════════════════════════════════════════════════════════
 //  UTILITY FUNCTIONS
-// ════════════════════════════════════════════════════════════════
 
 /** Euclidean distance between two {x,y} objects. */
 function dist(a, b) {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }
 
-/**
- * Liang-Barsky line-segment vs axis-aligned rectangle intersection test.
- * Returns true if the segment p1→p2 intersects rectangle r.
- */
+
 function segHitsRect(p1, p2, r) {
   const dx = p2.x - p1.x, dy = p2.y - p1.y;
   const P = [-dx,  dx,  -dy,  dy];
@@ -223,12 +211,7 @@ function segHitsRect(p1, p2, r) {
   return t0 <= t1;
 }
 
-/**
- * Liang-Barsky ray vs axis-aligned rect.
- * Returns the parametric t ∈ (0,1] of the first intersection,
- * or null if the segment p1→p2 does not hit rect r.
- * t=0 means at p1, t=1 means at p2.
- */
+
 function rayHitT(p1, p2, r) {
   const dx = p2.x - p1.x, dy = p2.y - p1.y;
   const P = [-dx,  dx,  -dy,  dy];
@@ -271,9 +254,7 @@ function moveWithCollision(entity, dx, dy, spd, dt) {
 }
 
 
-// ════════════════════════════════════════════════════════════════
 //  CANVAS & SCALING
-// ════════════════════════════════════════════════════════════════
 
 const canvas = document.getElementById('gameCanvas');
 const ctx    = canvas.getContext('2d');
@@ -294,10 +275,8 @@ function screenToGame(sx, sy) {
 }
 
 
-// ════════════════════════════════════════════════════════════════
 //  GAME STATE
 //  States: MENU | PLAYING | PAUSED | WIN | GAMEOVER
-// ════════════════════════════════════════════════════════════════
 
 let gameState = 'MENU';
 let player, guards;
@@ -368,9 +347,8 @@ function nextLevel() {
 }
 
 
-// ════════════════════════════════════════════════════════════════
 //  DRAWING – World
-// ════════════════════════════════════════════════════════════════
+
 
 function drawBG() {
   ctx.fillStyle = C.bg;
@@ -510,9 +488,7 @@ function drawHidingSpots(t) {
 }
 
 
-// ════════════════════════════════════════════════════════════════
 //  DRAWING – HUD
-// ════════════════════════════════════════════════════════════════
 
 function drawHUD() {
   const bw = 160, bh = 10, bx = 20, by = 20;
@@ -621,9 +597,7 @@ function drawHUD() {
 }
 
 
-// ════════════════════════════════════════════════════════════════
 //  DRAWING – Screen overlays
-// ════════════════════════════════════════════════════════════════
 
 let menuT = 0; // incremented each frame for menu animations
 
@@ -902,17 +876,13 @@ function drawWin() {
 }
 
 
-// ════════════════════════════════════════════════════════════════
 //  INPUT STATE
-// ════════════════════════════════════════════════════════════════
 
 const keys     = {};          // map of KeyboardEvent.code → boolean
 const mousePos = { x: 0, y: 0 }; // game-space mouse position
 
 
-// ════════════════════════════════════════════════════════════════
 //  EVENTS  (fulfils the 10+ required event types)
-// ════════════════════════════════════════════════════════════════
 
 // 1. keydown – movement, ESC pause, R restart, Space/Enter confirm
 window.addEventListener('keydown', e => {
@@ -993,9 +963,7 @@ window.addEventListener('huntModeStart', ()  => console.log('[GAME] ⚠ HUNT MOD
 window.addEventListener('huntModeEnd',   ()  => console.log('[GAME] Hunt mode ended'));
 
 
-// ════════════════════════════════════════════════════════════════
 //  ALERT LEVEL  (global tension meter driven by guard AI states)
-// ════════════════════════════════════════════════════════════════
 
 function updateAlert(dt) {
   if (huntMode) {
@@ -1031,9 +999,7 @@ function updateAlert(dt) {
 }
 
 
-// ════════════════════════════════════════════════════════════════
-//  GAME LOOP  (requestAnimationFrame – event type #10)
-// ════════════════════════════════════════════════════════════════
+//  GAME LOOP  (requestAnimationFrame – event type #10
 
 let lastTS = 0;
 
@@ -1089,9 +1055,7 @@ function loop(ts) {
 }
 
 
-// ════════════════════════════════════════════════════════════════
 //  BOOT  (window load event – event type #11)
-// ════════════════════════════════════════════════════════════════
 
 window.addEventListener('load', () => {
   resizeCanvas();
