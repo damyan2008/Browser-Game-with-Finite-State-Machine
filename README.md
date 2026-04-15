@@ -1,11 +1,10 @@
 # GHOST PROTOCOL 🕵️
 
 A browser-based top-down stealth game built with HTML5 Canvas and JavaScript.  
-**Assignment:** Browser Game with Finite State Machine · Math for Devs \& IT
 
 \---
 
-## 🎮 How to Play
+## How to Play
 
 |Action|Control|
 |-|-|
@@ -15,11 +14,11 @@ A browser-based top-down stealth game built with HTML5 Canvas and JavaScript.
 |Restart|`R`|
 |Confirm / Start|`Space` or `Enter`|
 
-**Objective:** Collect all 3 gold data chips scattered around the map, then reach the **EXIT** circle in the bottom-right corner — without being caught by any of the 5 guards.
+**Objective:** Collect all gold data chips scattered around the map, then reach the **EXIT** circle without being caught by any of the guards.
 
 \---
 
-## 🤖 Guard FSM AI
+## Guard FSM
 
 Each guard is controlled by a **Finite State Machine** with 6 states:
 
@@ -32,22 +31,9 @@ Each guard is controlled by a **Finite State Machine** with 6 states:
 |`SEARCH`|🟣 Purple|Investigates the last known position|
 |`RETURN`|🔵 Blue|Returns to starting waypoint|
 
-### Transition Table
+![image info](./diagram.png)
 
-|From|To|Condition|
-|-|-|-|
-|PATROL|ALERT|Player enters FOV + line of sight|
-|ALERT|CHASE|0.8 s reaction delay expires|
-|CHASE|ATTACK|Distance < 26 px|
-|ATTACK|CHASE|Distance ≥ 40 px (player backed away)|
-|CHASE / ATTACK|SEARCH|Lost visual contact for 1.5 s|
-|SEARCH|RETURN|Searched for 4.5 s without re-spotting|
-|RETURN|PATROL|Arrived back at start waypoint|
-|SEARCH / RETURN / PATROL|ALERT|Player spotted again|
-
-\---
-
-## ⚡ Implemented Events (10+)
+## Implemented Events
 
 1. `keydown` – movement, ESC pause, R restart, Space/Enter confirm
 2. `keyup` – release held movement keys
@@ -61,32 +47,8 @@ Each guard is controlled by a **Finite State Machine** with 6 states:
 10. `requestAnimationFrame` – main game loop
 11. Custom: `gameStart`, `gameOver`, `gameWin`, `chipCollected`, `canvasResized`
 
-\---
-
-## 🗂️ File Structure
-
-```
-game/
-├── assets/
-│   ├── images/      (sprite sheets / UI graphics – future)
-│   └── sounds/      (sound effects / music – future)
-├── js/
-│   ├── fsm.js       Reusable Finite State Machine class
-│   ├── player.js    Particle system + Player entity
-│   ├── enemy.js     Guard entity (FSM AI)
-│   └── main.js      Constants, map, utils, canvas, loop, events
-├── css/
-│   └── style.css    Global styles + CRT scanline effect
-├── index.html       Entry point
-└── README.md
-```
-
-\---
-
-## 🛠️ Technologies
+## Technologies
 
 * HTML5 Canvas API
-* Vanilla JavaScript (ES6+ classes, arrow functions, const/let)
-* CSS3 (custom properties, @import Google Fonts)
-* No external libraries or build tools
-
+* Vanilla JavaScript
+* CSS3 (@import Google Fonts)
